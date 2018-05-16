@@ -51,21 +51,34 @@
         this.orb.setGravityY(100);
         //this.orb.setGravityX(1);
 
-        this.orb.setBounce(0.5);
-        this.orb.setCollideWorldBounds(true);
+        this.orb.setBounce(0.3);
+        this.orb.setCollideWorldBounds(true, true, true, true);
         
     }
 
 
     function update () {
-           
+        if (this.input.activePointer.isDown) {
+            var mouseX = this.input.activePointer.x;
+            var mouseY = this.input.activePointer.y;
 
+            var dx = mouseX - this.orb.x;
+            var dy = mouseY - this.orb.y;
+            
+            dx = dx * 0.6;
+            dy *= 0.6;
 
+            this.orb.body.setAcceleration(dx * 20, dy * 20);
+        } else {
+            this.orb.body.setAcceleration(0,0);
+        }
+
+        /*
         if (this.input.activePointer.isDown) {
             if (this.input.activePointer.x > this.orb.x) {
-                this.orb.x += 10;
+                this.orb.x += 1;
             }else if (this.input.activePointer.x < this.orb.x) {
-                this.orb.x -= 10;
+                this.orb.x -= 1;
             }
            
         }
@@ -78,6 +91,7 @@
             }
            
         }
+        //*/
        
 
     }
