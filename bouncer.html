@@ -21,7 +21,7 @@
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 500 },
+            gravity: { y: 0 },
             debug: false
         }
     },
@@ -33,35 +33,82 @@
 };
 
     var game = new Phaser.Game(config);
+    var end = false;
+    var score = 0;
+    var text;
 
 
     function preload () {
         this.load.image("background", "./assets/background.png");
+        this.load.image("forest", "./assets/forest.png");
         this.load.image("orb", "./assets/ball.png");   
         this.load.image("saw", "./assets/saw.png")
+        this.load.image("mountain", "./assets/rock.png")
+        
+
+
+        //this.load.image("tile", "./assets/groundblock.png")
 
 
     }
 
     function create () {
-        this.background = this.add.image(400, 300, "background");
+        //this.background = this.add.image(400, 300, "background");
+        //this.background= game.add.tileSprite(0, 0, 800, 600, 'background');
+        //this.forest = this.add.image(400, 300, 'forest');
+        this.mountain = this.add.image(400, 300, "mountain");
+        this.forest = this.add.image(400, 300, "forest");
+
+
+
         this.orb = this.physics.add.image(400, 300, "orb").setActive().setVelocity(0, 0).setBounce(0);
         //this.orb = Phaser.Physics.Matter.Matter.Query.point(this.matter.world.localWorld.bodies, pointer);
         this.orb.setScale(0.9);
         
-        this.orb.setGravityY(100);
+        this.orb.setGravityY(1000);
         //this.orb.setGravityX(1);
 
-        this.saw = this.physics.add.image(600, 300, "saw");
-        this.physics.add.collider(this.orb, this.saw);
+        this.saw = this.physics.add.image(950, 200, "saw").setActive().setVelocity(0, 0).setBounce(0);
+        this.physics.add.collider(this.orb, this.saw, onOrbSawCollision, null, this);
+        this.saw.setGravityX(0);
+        this.saw.setGravityY(0);
+        this.saw.body.setAcceleration(-200, 0);
+
+
+        //this.tile = this.physics.add.image(320, 320, "tile");
+        //this.tile.set("body.allowGravity", false);
 
         this.orb.setBounce(0.3);
         this.orb.setCollideWorldBounds(true, true, true, true);
         
+
+
+        /*this.physics.add.collider(this.saw, this.orb);
+
+        this.physics.add.overlap(this.orb, this.saw, end_game, null, this);
+
+        function end_game(orb, saw) {
+            gameover();
+        }*/
+
+
+
+
+
+        scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#fffff' });
+
+
     }
 
 
     function update () {
+
+        scoreText.setText('Score: ' + score);
+
+
+        this.forest.x += -4;
+        this.mountain.x += -1;
+
         if (this.input.activePointer.isDown) {
             var mouseX = this.input.activePointer.x;
             var mouseY = this.input.activePointer.y;
@@ -72,17 +119,32 @@
             dx = dx * 0.6;
             dy *= 0.6;
 
-            this.orb.body.setAcceleration(dx * 20, dy * 20);
+            this.orb.body.setAcceleration(dx * 15, dy * 15);
         } else {
             this.orb.body.setAcceleration(0,0);
         }
         
-        if (this.saw.y > 600) {
-            this.saw.y = -50;
-            this.saw.body.setVelocity(0, 50);
+        if (this.saw.x < -50) {
+            this.saw.y = 200; 
+            this.saw.x = 950;
+            this.saw.body.setVelocity(-200,0);
         }
 
+        if (this.forest.x < -280) {
+            this.forest.x = 1150;
+        }
+
+        if (this.mountain.x < -50) {
+            this.mountain.x = 950;
+        }
+
+        /*function gameover() {
+            this.cameras.main.shake(300);
+        }
         
+        if (Phaser.Geom.Intersects.RectangleToRectangle(this.orb.getBounds(), this.saw.getBounds())) {
+        this.gameover();
+        }*/
 
     
         /*
@@ -106,6 +168,11 @@
         //*/
        
 
+    }
+
+    function onOrbSawCollision(orb, saw) {
+        //console.log(this);
+        this.cameras.main.shake(300);
     }
 
 </script>
